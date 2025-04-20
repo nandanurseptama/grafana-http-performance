@@ -1,0 +1,22 @@
+services:
+  spring-app:
+    image: spring-example-app
+    restart: always
+    ports:
+      - 8080:8080
+  prometheus:
+    image: prom/prometheus
+    restart: always
+    ports:
+      - 9090:9090 # expose prometheus service port
+    volumes:
+      - ./volumes/prometheus:/prometheus # mounting prometheus directory data to container directory
+      - ./configs/prometheus.yml:/etc/prometheus/prometheus.yml # mounting prometheus local directory config
+  grafana:
+    image: grafana/grafana
+    restart: always
+    ports:
+      - 3000:3000
+    volumes:
+      - ./configs/provisionings/grafana:/etc/grafana/provisioning
+      - ./volumes/grafana:/var/lib/grafana
