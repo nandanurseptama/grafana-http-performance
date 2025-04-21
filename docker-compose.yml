@@ -1,4 +1,14 @@
 services:
+  express-app:
+    image: express-app
+    restart: always
+    ports:
+      - 8082:8082
+  golang-app:
+    image: golang-app
+    restart: always
+    ports:
+      - 8081:8081
   spring-app:
     image: spring-example-app
     restart: always
