@@ -29,4 +29,5 @@ services:
       - 3000:3000
     volumes:
       - ./configs/provisionings/grafana:/etc/grafana/provisioning
+      - ./grafana-dashboards:/usr/lib/dashboards
       - ./volumes/grafana:/var/lib/grafana
