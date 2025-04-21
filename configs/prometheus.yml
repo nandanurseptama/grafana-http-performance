@@ -4,3 +4,13 @@ scrape_configs:
     scrape_interval: 15s # This can be adjusted based on our needs
     static_configs:
       - targets: ['spring-app:8080']
+  - job_name: 'golang-app'
+    metrics_path: '/metrics'
+    scrape_interval: 15s # This can be adjusted based on our needs
+    static_configs:
+      - targets: ['golang-app:8081']
+  - job_name: 'express-app'
+    metrics_path: '/metrics'
+    scrape_interval: 15s # This can be adjusted based on our needs
+    static_configs:
+      - targets: ['express-app:8082']
