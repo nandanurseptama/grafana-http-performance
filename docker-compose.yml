@@ -1,4 +1,9 @@
 services:
+  rust-app:
+    image: rust-app
+    restart: always
+    ports:
+      - 8083:8083
   express-app:
     image: express-app
     restart: always
