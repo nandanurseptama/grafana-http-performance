@@ -1,4 +1,7 @@
-use actix_web::{App, HttpResponse, HttpServer, get, web};
+mod middleware;
+
+use actix_web::{App, HttpResponse, HttpServer, Responder, get, web};
+use middleware::Metrics;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -37,7 +40,21 @@ async fn fib(query: web::Query<FibonacciParam>) -> HttpResponse {
         data: Some(x),
     };
 
-    return HttpResponse::BadRequest().json(body);
+    return HttpResponse::Ok().json(body);
+}
+
+async fn metrics() -> impl Responder {
+    use prometheus::{Encoder, TextEncoder};
+
+    let encoder = TextEncoder::new();
+    let metric_families = prometheus::gather();
+
+    let mut buffer = Vec::new();
+    encoder.encode(&metric_families, &mut buffer).unwrap();
+
+    HttpResponse::Ok()
+        .content_type(encoder.format_type())
+        .body(buffer)
 }
 
 fn fibonacci(n: u32) -> u32 {
@@ -50,9 +67,14 @@ fn fibonacci(n: u32) -> u32 {
 
 #[actix_web::main] // or #[tokio::main]
 async fn main() -> std::io::Result<()> {
-    println!("hello");
-    HttpServer::new(|| App::new().service(fib).service(hello))
-        .bind(("127.0.0.1", 8083))?
-        .run()
-        .await
+    HttpServer::new(|| {
+        App::new()
+            .wrap(Metrics)
+            .service(hello)
+            .service(fib)
+            .route("/metrics", web::get().to(metrics))
+    })
+    .bind(("0.0.0.0", 8083))?
+    .run()
+    .await
 }
